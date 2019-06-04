@@ -1,6 +1,9 @@
 package ru.avalon.java.j30.labs;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Properties;
@@ -20,6 +23,7 @@ public class Main {
      * Точка входа в приложение
      * 
      * @param args the command line arguments
+     * @throws java.sql.SQLException
      */
     public static void main(String[] args) throws SQLException {
         /*
@@ -31,6 +35,10 @@ public class Main {
             printAllCodes(connection);
 
             code.setCode("MV");
+            code.save(connection);
+            printAllCodes(connection);
+            
+            code.setDescription("Проверка обновления поля");
             code.save(connection);
             printAllCodes(connection);
         }
@@ -46,9 +54,9 @@ public class Main {
      */    
     private static void printAllCodes(Connection connection) throws SQLException {
         Collection<ProductCode> codes = ProductCode.all(connection);
-        for (ProductCode code : codes) {
+        codes.forEach((code) -> {
             System.out.println(code);
-        }
+        });
     }
     /**
      * Возвращает URL, описывающий месторасположение базы данных
@@ -59,7 +67,7 @@ public class Main {
         /*
          * TODO #02 Реализуйте метод getUrl
          */
-        throw new UnsupportedOperationException("Not implemented yet!");
+        return "jdbc:derby://localhost:1527/J30LR2";
     }
     /**
      * Возвращает параметры соединения
@@ -71,7 +79,18 @@ public class Main {
         /*
          * TODO #03 Реализуйте метод getProperties
          */
-        throw new UnsupportedOperationException("Not implemented yet!");
+         String PATH_TO_PROPERTIES = 
+  "/Users/andrejzigula/Downloads/lab-2-toxedomoon-master/src/ru/avalon/java/j30/labs/DB.properties";
+        Properties properties = new Properties();
+        try {
+            FileInputStream fileInputStream = new FileInputStream(PATH_TO_PROPERTIES);
+            properties.load(fileInputStream);
+            fileInputStream.close();
+        } catch (IOException e) {
+            System.out.println("Файл параметров не найден!..");
+            e.printStackTrace();
+        }
+        return properties;
     }
     /**
      * Возвращает соединение с базой данных Sample
@@ -83,7 +102,10 @@ public class Main {
         /*
          * TODO #04 Реализуйте метод getConnection
          */
-        throw new UnsupportedOperationException("Not implemented yet!");
+        Connection connection = DriverManager.getConnection(getUrl(), getProperties());
+        System.out.println("Соединение установлено!...");
+
+        return connection;
     }
     
 }
